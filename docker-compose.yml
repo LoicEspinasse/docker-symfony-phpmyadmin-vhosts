@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+  # Database
+  database:
+    image: mysql:5.7
+    container_name: db_symfony_blog
+    volumes:
+      - database_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: db_symfony_blog
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    networks:
+      - dev
+    
+  # phpmyadmin
+  phpmyadmin:
+    depends_on:
+      - database
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - '8080:80'
+    environment:
+      PMA_HOST: database
+      MYSQL_ROOT_PASSWORD: password 
+    networks:
+      - dev
+
+  #www
+  www:
+    build: docker
+    container_name: www_symblog_youtube
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./docker/vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www
+    networks:
+      - dev
+
+networks: 
+  dev:
+    
+volumes:
+  database_data:
